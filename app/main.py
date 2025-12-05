@@ -50,12 +50,12 @@ async def analizar(request: Request, archivos: List[UploadFile] = File(...)):
             {
                 "request": request,
                 "resultados": resultados,
-                "mensaje": "✅ Análisis completado con éxito.",
+                "mensaje": "Análisis completado con éxito.",
             },
         )
     except Exception as e:
         traceback.print_exc()
         return templates.TemplateResponse(
             "index.html",
-            {"request": request, "error": f"❌ Ocurrió un error: {str(e)}"},
+            {"request": request, "error": f"Ocurrió un error: {str(e)}"},
         )
