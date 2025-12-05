@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto lenguaje de programación</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/static/js/tailwind-config.js"></script>
+
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="bg-slate-50/50 text-slate-950 min-h-screen flex flex-col antialiased selection:bg-sky-100 selection:text-sky-900">
+
+    <nav class="border-b border-slate-200 bg-white/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-gradient-to-br from-sky-500 to-blue-600 text-white p-2 rounded-xl shadow-lg shadow-sky-500/20">
+                        <!-- Icon: BarChart3 (Lucide) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-slate-900 leading-tight">Proyecto lenguaje de programación</h1>
+                        <p class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Dashboard de Ventas</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="/" class="text-sm font-medium text-slate-500 hover:text-sky-600 transition-colors">Inicio</a>
+                    <div class="h-4 w-px bg-slate-200"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        
+        <!-- Mensajes de Estado -->
+        {% if error %}
+        <div class="mb-8 bg-red-50 border border-red-100 text-red-800 px-4 py-4 rounded-xl flex items-center gap-3 text-sm font-medium shadow-sm" role="alert">
+            <div class="bg-red-100 p-1 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-600" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>
+            </div>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Formulario para Subir Archivos -->
+        {% if not resultados %}
+        <div class="text-center mb-12 space-y-4">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Analiza tus envíos</h2>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">Sube tus reportes de ventas en Excel para obtener insights instantáneos, proyecciones y métricas clave.</p>
+        </div>
+
+        <div class="max-w-xl mx-auto">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 p-1">
+                <div class="p-8 border border-dashed border-slate-200 rounded-xl bg-slate-50/50 hover:bg-sky-50/30 transition-colors group">
+                    <form action="/analizar" method="post" enctype="multipart/form-data" class="text-center">
+                        <div class="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-100 text-sky-600 group-hover:scale-110 transition-transform duration-300">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-900 mb-2">Sube tus archivos aquí</h3>
+                        <p class="text-sm text-slate-500 mb-8">Arrastra y suelta tus archivos .xlsx o haz clic para explorar</p>
+                        
+                        <label class="relative inline-flex">
+                            <span class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-medium rounded-xl text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 cursor-pointer shadow-lg shadow-sky-500/30 transition-all">
+                                Seleccionar Archivos
+                            </span>
+                            <input type="file" name="archivos" multiple accept=".xlsx" required class="hidden" onchange="this.form.submit()">
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        
+        <!-- Resultados de la Análisis -->
+        <div class="mb-10 flex flex-col md:flex-row items-center justify-between bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <div class="flex items-center gap-6">
+                <div class="relative">
+                    <div class="absolute inset-0 bg-sky-200 blur-lg opacity-50 rounded-full"></div>
+                    <div class="relative bg-gradient-to-br from-sky-400 to-blue-500 text-white p-4 rounded-2xl shadow-inner">
+                        <!-- Icon: FileCheck (Lucide) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="m9 15 2 2 4-4"/></svg>
+                    </div>
+                    <div class="absolute -bottom-1 -right-1 bg-green-500 border-2 border-white w-4 h-4 rounded-full"></div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <h2 class="text-xl font-bold text-slate-900">Análisis Completado</h2>
+                        <span class="inline-flex items-center rounded-md bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 ring-1 ring-inset ring-sky-700/10">Exitoso</span>
+                    </div>
+                    <p class="text-sm text-slate-500">Se han procesado <span class="font-semibold text-slate-700">{{ resultados.total_registros }} registros</span> correctamente.</p>
+                </div>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-3">
+                <a href="/static/salidas/{{ resultados.archivo_reporte }}" class="inline-flex items-center justify-center px-4 py-2 border border-slate-200 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 hover:text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Descargar Reporte
+                </a>
+                <a href="/" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-sky-600 hover:bg-sky-700 shadow-sm hover:shadow transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path><line x1="14" y1="2" x2="14" y2="8"></line><line x1="14" y1="8" x2="20" y2="8"></line></svg>
+                    Nuevo Análisis
+                </a>
+            </div>
+        </div>
+
+        <!-- Grid de KPIs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <!-- KPI 1 -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <div class="flex flex-row items-center justify-between pb-2">
+                    <div class="text-sm font-medium text-slate-500 group-hover:text-sky-600 transition-colors">Total Registros</div>
+                    <div class="p-2 bg-slate-50 rounded-lg group-hover:bg-sky-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">{{ resultados.total_registros }}</div>
+                <p class="text-xs text-slate-400 mt-1">Transacciones procesadas</p>
+            </div>
+            <!-- KPI 2 -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <div class="flex flex-row items-center justify-between pb-2">
+                    <div class="text-sm font-medium text-slate-500 group-hover:text-sky-600 transition-colors">Media Total</div>
+                    <div class="p-2 bg-slate-50 rounded-lg group-hover:bg-sky-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">S/ {{ "%.2f"|format(resultados.estadisticas.media_total) }}</div>
+                <p class="text-xs text-slate-400 mt-1">Promedio por envío</p>
+            </div>
+            <!-- KPI 3 -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <div class="flex flex-row items-center justify-between pb-2">
+                    <div class="text-sm font-medium text-slate-500 group-hover:text-sky-600 transition-colors">Peso Máximo</div>
+                    <div class="p-2 bg-slate-50 rounded-lg group-hover:bg-sky-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-sky-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"/></svg>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-slate-900">{{ "%.2f"|format(resultados.estadisticas.peso_max) }} Kg</div>
+                <p class="text-xs text-slate-400 mt-1">Carga más pesada</p>
+            </div>
+            <!-- KPI 4 -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 group">
+                <div class="flex flex-row items-center justify-between pb-2">
+                    <div class="text-sm font-medium text-slate-500 group-hover:text-red-600 transition-colors">Outliers</div>
+                    <div class="p-2 bg-slate-50 rounded-lg group-hover:bg-red-50 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400 group-hover:text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                </div>
+                <div class="text-2xl font-bold text-slate-900 group-hover:text-red-600 transition-colors">{{ resultados.outliers_count }}</div>
+                <p class="text-xs text-slate-400 mt-1">Valores atípicos detectados</p>
+            </div>
+        </div>
+
+        <!-- Estadísticas Generales (NumPy) -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full max-w-md">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-rose-50 rounded-lg text-rose-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-500">Desviación Estándar</p>
+                        <h3 class="text-2xl font-bold text-slate-900">S/ {{ "%.2f"|format(resultados.estadisticas.desv_total) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid: Proyección y Distribución -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            
+            <!-- Proyección (Line Chart) -->
+            {% if resultados.proyeccion %}
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h4 class="text-base font-semibold text-slate-900 mb-1">Proyección de Ventas</h4>
+                        <p class="text-sm text-slate-500">Tendencia y pronóstico a 7 días (Holt-Winters)</p>
+                    </div>
+                    <span class="inline-flex items-center rounded-full bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 ring-1 ring-inset ring-sky-600/20">Predictivo</span>
+                </div>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartProyeccion"></canvas>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Participación por Servicio (Donut) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Participación por Servicio</h4>
+                <p class="text-sm text-slate-500 mb-6">Distribución de ventas por tipo</p>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="chartPieServicio"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid: Análisis Operativo -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Evolución de Peso (Line) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm col-span-1 lg:col-span-2">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Evolución de Peso Diario</h4>
+                <p class="text-sm text-slate-500 mb-6">Total de Kg transportados por día</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartPesoDiario"></canvas>
+                </div>
+            </div>
+
+            <!-- Categorías de Envío (Pie) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm col-span-1">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Categorías de Envío</h4>
+                <p class="text-sm text-slate-500 mb-6">Clasificación por reglas</p>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="chartCategorias"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid: Histograma y Top Vendedores -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+             <!-- Histograma de Pesos (Bar) -->
+             <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Distribución de Pesos</h4>
+                <p class="text-sm text-slate-500 mb-6">Frecuencia de rangos de peso (Kg)</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartHistograma"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Vendedores (Bar) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Top 10 Vendedores</h4>
+                <p class="text-sm text-slate-500 mb-6">Mejores rendimientos en ventas</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartTopVendedores"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid: Análisis de Facturación -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Facturación por Servicio (Bar) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Facturación por Servicio</h4>
+                <p class="text-sm text-slate-500 mb-6">Total recaudado por tipo de servicio</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartBarServicio"></canvas>
+                </div>
+            </div>
+
+            <!-- Facturación por Destino (Bar) -->
+            <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+                <h4 class="text-base font-semibold text-slate-900 mb-1">Facturación por Destino</h4>
+                <p class="text-sm text-slate-500 mb-6">Total recaudado por ciudad</p>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartBarDestino"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tablas Detalladas -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            
+            <!-- Top 5 Destinos -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden col-span-1">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-base font-semibold text-slate-900">Top 5 Destinos</h3>
+                    <p class="text-sm text-slate-500">Ciudades con mayor facturación</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">Ciudad</th>
+                                <th class="px-6 py-3 font-medium text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for row in resultados.top_destinos %}
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-3 font-medium text-slate-900">{{ row.CiudadDestino }}</td>
+                                <td class="px-6 py-3 text-right text-slate-600">S/ {{ "%.2f"|format(row.Total) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- KPI Pivot Table -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden col-span-1 lg:col-span-2">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                    <h3 class="text-base font-semibold text-slate-900">KPIs por Servicio</h3>
+                    <p class="text-sm text-slate-500">Métricas clave detalladas por tipo de servicio</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                            <tr>
+                                <th class="px-6 py-3 font-medium">Servicio</th>
+                                <th class="px-6 py-3 font-medium text-right">Envíos</th>
+                                <th class="px-6 py-3 font-medium text-right">Total Facturado</th>
+                                <th class="px-6 py-3 font-medium text-right">Ticket Prom.</th>
+                                <th class="px-6 py-3 font-medium text-right">Peso Prom.</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for row in resultados.kpis %}
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-4 font-medium text-slate-900">{{ row.Servicio }}</td>
+                                <td class="px-6 py-4 text-right text-slate-600">{{ row.CantidadEnvios }}</td>
+                                <td class="px-6 py-4 text-right text-slate-600">S/ {{ "%.2f"|format(row.TotalFacturado) }}</td>
+                                <td class="px-6 py-4 text-right text-slate-600">S/ {{ "%.2f"|format(row.TicketPromedio) }}</td>
+                                <td class="px-6 py-4 text-right text-slate-600">{{ "%.2f"|format(row.PesoPromedioKg) }} Kg</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pareto Table -->
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                <h3 class="text-base font-semibold text-slate-900">Análisis de Pareto (Top Vendedores)</h3>
+                <p class="text-sm text-slate-500">Vendedores que representan el 80% de las ventas.</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-3 font-medium">Vendedor</th>
+                            <th class="px-6 py-3 font-medium text-right">Total Ventas</th>
+                            <th class="px-6 py-3 font-medium text-right">% Acumulado</th>
+                            <th class="px-6 py-3 font-medium text-center">Clasificación</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for row in resultados.pareto_vendedores %}
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-slate-900">{{ row.Vendedor }}</td>
+                            <td class="px-6 py-4 text-right text-slate-600">S/ {{ "%.2f"|format(row.Total) }}</td>
+                            <td class="px-6 py-4 text-right text-slate-600">{{ "%.1f"|format(row.Acumulado * 100) }}%</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-flex items-center rounded-full bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700 ring-1 ring-inset ring-sky-600/20">Top 80%</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% endif %}
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sm text-slate-500">© 2025 Proyecto lenguaje de programación</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    {% if resultados %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    
+    <!-- Datos para el Dashboard (JSON) -->
+    <script id="dashboard-data" type="application/json">
+        {
+            "proyeccion": {{ resultados.proyeccion | tojson if resultados.proyeccion else 'null' }},
+            "graficos_servicio": {{ resultados.graficos_servicio | tojson }},
+            "graficos_destino": {{ resultados.graficos_destino | tojson }},
+            "grafico_peso_diario": {{ resultados.grafico_peso_diario | tojson }},
+            "grafico_categorias": {{ resultados.grafico_categorias | tojson }},
+            "grafico_vendedores": {{ resultados.grafico_vendedores | tojson }},
+            "histograma": {{ resultados.histograma | tojson }},
+            "top_destinos": {{ resultados.top_destinos | tojson }},
+            "kpis": {{ resultados.kpis | tojson }}
+        }
+    </script>
+
+    <script>
+        // Inicializar gráficos leyendo los datos del script JSON
+        document.addEventListener('DOMContentLoaded', () => {
+            const dataElement = document.getElementById('dashboard-data');
+            const datosDashboard = JSON.parse(dataElement.textContent);
+            renderDashboard(datosDashboard);
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
